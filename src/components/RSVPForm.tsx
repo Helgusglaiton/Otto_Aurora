@@ -7,6 +7,38 @@ export default function RSVPForm() {
   const [stats, setStats] = useState<{ aurora: number, otto: number } | null>(null);
   const [userVote, setUserVote] = useState<string>('');
 
+  const handleAddToCalendar = () => {
+    // Definimos dados fictícios de exemplo (o usuário pode alterar o local e data depois no código)
+    const event = {
+      title: 'Chá Revelação: Aurora ou Otto?',
+      description: 'Venha celebrar com a gente e descobrir quem está a caminho! 🩷🩵',
+      location: 'Local do Chá',
+      startTime: '20260808T130000', 
+      endTime: '20260808T170000'
+    };
+
+    const icsData = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Chá Revelação//App//PT
+BEGIN:VEVENT
+SUMMARY:${event.title}
+DESCRIPTION:${event.description}
+LOCATION:${event.location}
+DTSTART:${event.startTime}
+DTEND:${event.endTime}
+END:VEVENT
+END:VCALENDAR`;
+
+    const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'cha-revelacao.ics');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus('loading');
@@ -81,8 +113,21 @@ export default function RSVPForm() {
                 </div>
               </div>
             )}
-            
-            <button className="location-btn" onClick={() => setIsOpen(false)} style={{ marginTop: '20px', width: '100%', padding: '12px 0' }}>Fechar</button>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+              <button 
+                onClick={handleAddToCalendar} 
+                style={{ flex: 1, padding: '12px 0', background: 'var(--color-tan)', color: 'white', border: 'none', borderRadius: '15px', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                📅 Adicionar à Agenda
+              </button>
+              <button 
+                className="location-btn" 
+                onClick={() => setIsOpen(false)} 
+                style={{ flex: 1, padding: '12px 0' }}
+              >
+                Fechar
+              </button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="rsvp-form">
