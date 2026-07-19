@@ -6,6 +6,7 @@ export default function RSVPForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [stats, setStats] = useState<{ aurora: number, otto: number } | null>(null);
   const [userVote, setUserVote] = useState<string>('');
+  const [showCalendarPopup, setShowCalendarPopup] = useState(false);
 
   const handleAddToCalendar = () => {
     // Definimos dados fictícios de exemplo (o usuário pode alterar o local e data depois no código)
@@ -73,6 +74,7 @@ END:VCALENDAR`;
           setStats(result.stats);
         }
         setStatus('success');
+        setShowCalendarPopup(true);
       } else {
         setStatus('error');
       }
@@ -94,6 +96,28 @@ END:VCALENDAR`;
 
   return (
     <div className="rsvp-overlay">
+      {showCalendarPopup && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
+          <div style={{ background: 'white', padding: '40px 30px', borderRadius: '30px', maxWidth: '400px', width: '100%', textAlign: 'center', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '10px' }}>🗓️</div>
+             <h3 className="cursive" style={{ color: 'var(--color-terracotta)', fontSize: '3rem', margin: '0 0 10px 0' }}>Anote aí!</h3>
+             <p style={{ color: 'var(--color-brown-deep)', marginBottom: '25px', fontSize: '1.2rem', lineHeight: 1.5 }}>Gostaria de adicionar o nosso Chá Revelação na agenda do seu celular para não esquecer o dia e o horário?</p>
+             <button 
+               onClick={() => { handleAddToCalendar(); setShowCalendarPopup(false); }} 
+               style={{ width: '100%', padding: '15px', background: 'var(--color-tan)', color: 'white', border: 'none', borderRadius: '30px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem', marginBottom: '15px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }}
+             >
+               Sim, adicionar à agenda
+             </button>
+             <button 
+               onClick={() => setShowCalendarPopup(false)} 
+               style={{ width: '100%', padding: '15px', background: 'transparent', color: '#888', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', textDecoration: 'underline' }}
+             >
+               Não, obrigado
+             </button>
+          </div>
+        </div>
+      )}
+
       <div className="rsvp-modal">
         {status === 'success' ? (
           <div className="success-message">
@@ -113,21 +137,7 @@ END:VCALENDAR`;
                 </div>
               </div>
             )}
-            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-              <button 
-                onClick={handleAddToCalendar} 
-                style={{ flex: 1, padding: '12px 0', background: 'var(--color-tan)', color: 'white', border: 'none', borderRadius: '15px', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                📅 Adicionar à Agenda
-              </button>
-              <button 
-                className="location-btn" 
-                onClick={() => setIsOpen(false)} 
-                style={{ flex: 1, padding: '12px 0' }}
-              >
-                Fechar
-              </button>
-            </div>
+            <button className="location-btn" onClick={() => setIsOpen(false)} style={{ marginTop: '20px', width: '100%', padding: '15px 0', fontSize: '1.1rem' }}>Concluir e Fechar</button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="rsvp-form">
