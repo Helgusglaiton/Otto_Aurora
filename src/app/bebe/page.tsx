@@ -32,6 +32,48 @@ function calculateAge(events: any[]) {
   return ageStr.join(' e ') + " de vida";
 }
 
+function renderPregnancyCountdown(color: string) {
+  // A data base é calculada usando o dia atual do pedido (2026-07-20) + 155 dias = 22 de Dezembro de 2026.
+  const edd = new Date('2026-12-22T12:00:00');
+  const now = new Date();
+  const diffTime = edd.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays <= 0) return null; // Se já passou a data, não exibe
+
+  return (
+    <div style={{ marginTop: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <p style={{ color: 'var(--color-brown-deep)', fontSize: '1.2rem', marginBottom: '15px' }}>Faltam aproximadamente</p>
+      <div 
+        style={{
+          background: color,
+          color: 'white',
+          padding: '20px 40px',
+          borderRadius: '50px',
+          boxShadow: `0 10px 30px ${color}40`,
+          animation: 'heartbeat 1.5s ease-in-out infinite',
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'center'
+        }}
+      >
+        <span style={{ fontSize: '3.5rem', fontWeight: 900, lineHeight: 1 }}>{diffDays}</span>
+        <span style={{ fontSize: '1.2rem', marginLeft: '10px', fontWeight: 'normal' }}>dias</span>
+      </div>
+      <p style={{ color: '#888', fontSize: '1rem', marginTop: '15px' }}>para a nossa maior aventura começar! 🍼</p>
+      <style>{`
+        @keyframes heartbeat {
+          0% { transform: scale(1); }
+          15% { transform: scale(1.05); }
+          30% { transform: scale(1); }
+          45% { transform: scale(1.05); }
+          60% { transform: scale(1); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 export default async function BebePage() {
   const status = await getRevealedStatus();
   
@@ -52,9 +94,14 @@ export default async function BebePage() {
       
       <div style={{ position: 'relative', zIndex: 1, background: 'rgba(255, 255, 255, 0.7)', padding: '40px 60px', borderRadius: '30px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)', backdropFilter: 'blur(5px)' }}>
         <h1 className="cursive" style={{ color: color, fontSize: '5rem', margin: '0' }}>{name}</h1>
-        <p style={{ color: 'var(--color-brown-deep)', fontSize: '1.4rem', marginTop: '10px', fontWeight: 500 }}>
-          {ageStr ? ageStr : "O grande amor de nossas vidas chegou!"}
-        </p>
+        
+        {(!ageStr || ageStr === "Na barriga da mamãe") ? (
+          renderPregnancyCountdown(color)
+        ) : (
+          <p style={{ color: 'var(--color-brown-deep)', fontSize: '1.4rem', marginTop: '10px', fontWeight: 500 }}>
+            {ageStr}
+          </p>
+        )}
       </div>
       
       <div style={{ background: 'white', padding: '40px', borderRadius: '25px', marginTop: '40px', zIndex: 1, boxShadow: '0 10px 30px rgba(0,0,0,0.05)', maxWidth: '600px', width: '100%' }}>
